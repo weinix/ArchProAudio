@@ -132,11 +132,58 @@ reboot
 
 ### 9. DAW & Plugins
 
-For regular work in a DAW, it is recommended to set its audio system to ALSA. If you need to listen to other external sources during a session, in REAPER you can change the ALSA input and output devices to "default" (you need to type this):
+#### DAW Audio System Configuration
+
+For regular work in a DAW, it is recommended to set its audio system to ALSA for direct hardware access and lowest latency. PipeWire/JACK adds an extra routing layer that can increase latency.
+
+**Why ALSA in DAWs:**
+- **Direct hardware access**: No audio routing overhead
+- **Lower latency**: Essential for real-time recording and monitoring
+- **Stable performance**: Predictable timing for audio processing
+
+**When to use ALSA devices:**
+```shell
+# For simple 2-channel recording (e.g., Steinberg UR22C)
+hw:UR22C,0
+
+# For multi-track recording (e.g., Behringer XR18)
+hw:X18,0
+
+# For direct access to your specific interface
+hw:CARD=[interface_name],DEV=0
+```
+
+**When to use "default" device:**
+If you need to listen to other external sources during a session, change the ALSA input and output devices to "default" (you need to type this manually):
 
 ![image](https://github.com/user-attachments/assets/956b4857-741e-4b5f-aba5-b5288e98bb37)
 
-Set your desired audio device using your desktop environment.
+**Why you must type "default" manually:**
+The "default" device is a virtual device that routes through PipeWire. Many DAWs only show physical hardware devices in their dropdown menus, so you must manually type "default" to access PipeWire routing for system audio integration.
+
+#### Multiple Audio Interface Strategy
+
+If you have multiple audio interfaces, choose based on your recording needs:
+
+**Steinberg UR22C (2-in/2-out):**
+- **Best for**: Solo recordings, podcasts, simple tracking
+- **Advantages**: Lowest latency, compact, simple setup
+- **Configuration**: `hw:UR22C,0`
+
+**Behringer XR18 (18-in/18-out):**
+- **Best for**: Band recording, multi-track projects, live sound
+- **Advantages**: 18 simultaneous channels, built-in mixer/effects, tablet control
+- **Configuration**: `hw:X18,0`
+
+**Interface Selection Guide:**
+- **Simple projects**: Use UR22C for simplicity and lowest latency
+- **Band recording**: Use XR18 for multi-track capability
+- **System audio needed**: Use "default" for PipeWire integration
+
+**Switching Between Interfaces:**
+Both interfaces are managed by PipeWire. Simply change the DAW's audio device setting and restart the DAW to switch between interfaces.
+
+Set your desired audio device using your desktop environment or directly in the DAW.
 
 DAW Install Examples:
 
@@ -164,6 +211,33 @@ yay -S bitwig-studio
 
 Also be sure to check out Qtractor, Tracktion Waveform, Mixbus, LMMS, Rosegarden, Zrythm etc...
 https://en.wikipedia.org/wiki/List_of_Linux_audio_software#Digital_audio_workstations_(DAWs)
+
+#### Audio Interface Selection Guide
+
+**Choosing the Right Interface:**
+
+| Interface | Channels | Best For | Latency | Features |
+|-----------|----------|-----------|---------|----------|
+| **UR22C** | 2-in/2-out | Solo work, podcasts | Very Low | Compact, portable |
+| **XR18** | 18-in/18-out | Band recording, live sound | Low | Built-in mixer, tablet control |
+| **Default** | Variable | System audio integration | Higher | PipeWire routing |
+
+**UR22C Use Cases:**
+- Voice recordings and podcasts
+- Single instrument tracking
+- Portable recording sessions
+- When lowest latency is critical
+
+**XR18 Use Cases:**
+- Recording full bands simultaneously
+- Live sound reinforcement
+- Projects requiring multiple microphones
+- When built-in mixing and effects are beneficial
+
+**Performance Considerations:**
+- **UR22C**: Fewer channels = lower CPU usage, best for CPU-intensive projects
+- **XR18**: More channels = higher CPU usage, but provides professional mixing capabilities
+- **Both**: Direct ALSA access provides optimal performance compared to PipeWire/JACK routing
 
 #### Native plugins (`yay -S [pkgname]` where appropriate)
 
@@ -254,6 +328,12 @@ Once everything is set up, don't forget to check that volume levels are set corr
 alsamixer
 ```
 to check that output is set to 100 (vertical bars) or gain of 0dB (top left of alsamixer). Use F6 to select the correct soundcard. You can also use your desktop environment's volume controls if you have your interface enabled there but note that numbers don't seem to match alsamixer.
+
+**Multiple Interface Volume Management:**
+- **UR22C**: Simple stereo output controls
+- **XR18**: Individual channel controls via mixer interface
+- **Switching interfaces**: Press F6 in alsamixer to select the correct device
+- **PipeWire**: You can also adjust levels using `pavucontrol` or your desktop's audio settings
 
 ![alsamixer](https://user-images.githubusercontent.com/120390802/209148828-f5654838-eb25-4dd2-9955-4e0e8db99be2.png)
 
